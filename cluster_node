@@ -1,0 +1,78 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import random
+
+####################################
+######### ALL UNITS IN SI ##########
+####################################
+
+total_nodes = 30                       #Assign beforhand
+node_id_list = []
+for i in range(total_nodes):
+    node_id = i+1
+    node_id_list.append(node_id)
+print(node_id_list)
+
+init_speed_x = 5
+init_speed_y = 0
+init_speed = np.array([init_speed_x, init_speed_y])
+acceleration = 0
+time_taken = 7.5
+
+node_parameters = []
+for j in node_id_list:
+
+    init_x = random.randint(-250,250)
+    init_y = random.randint(-250,250)
+    init_position = np.array([init_x,init_y])
+    #direction = random.randint(1,3)
+    direction = 1
+
+    node_parameters.append([init_position, init_speed, direction])
+print("every element has: \n x,y co-ordinates in m  \n speed in m//s   \n acceleration in m//s2   \n time taken in s")
+print(node_parameters)
+
+plt.ylim([0, 300])
+plt.xlim([-300, 300])
+for node in range(len(node_parameters)):
+    x = node_parameters[node][0][0]
+    y = node_parameters[node][0][1]
+    plt.scatter(x,y)
+plt.pause(5)
+plt.cla()
+
+
+new_node_parameters = []
+for node in range(len(node_parameters)):
+    init_position = node_parameters[node][0]
+    direction = node_parameters[node][2]
+    if direction == 1:
+        new_speed_x = init_speed_x
+        new_speed_y = 0
+    if direction == 2:
+        new_speed_x = 0
+        new_speed_y = init_speed_y
+    if direction == 3:
+        new_speed_x = 0
+        new_speed_y = init_speed_y*(-1)
+    new_speed = np.array([new_speed_x,new_speed_y])
+
+
+
+    #new_speed = init_speed + acceleration * time_taken
+
+
+    new_position = init_position + new_speed * time_taken
+
+    new_node_parameters.append([new_position, new_speed, direction])
+
+print(new_node_parameters)
+plt.ylim([0, 200])
+plt.xlim([-300, 300])
+for node in range(len(new_node_parameters)):
+    x_n = new_node_parameters[node][0][0]
+    y_n = new_node_parameters[node][0][1]
+    plt.scatter(x_n,y_n)
+plt.pause(5)
+#plt.cla()
