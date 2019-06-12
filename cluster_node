@@ -5,12 +5,19 @@ import random
 import itertools
 speed = 5
 time = 2
-speed_x = 5
-speed_y = 5
+number_of_nodes = 10
+speed_x = speed
+speed_y = speed
 class Node(object):
     """
         Node class:
-        the attributes consist of ID, position vector, direction
+        the attributes consist of   ID,                                 (Auto assigned, start wit 1, aito-increment by 1)
+                                    speed vector x component,           (derieved from user input)
+                                    speed vector y component,           (derieved from user input)
+                                    speed vector,                       (derieved from user input)
+                                    time taken,                         (user input)
+                                    position vector,                    (randomly assined in range [(0,()] )
+                                    direction                           (randomlyl assigned: 1: straight, 2 up, 3 down)
 
     """
     _ID = 1
@@ -61,16 +68,16 @@ def plot_positions(list_of_node_parameters):
         x = list_of_node_parameters[node].init_position[0]
         y = list_of_node_parameters[node].init_position[1]
         plt.scatter(x, y)
-    plt.pause(0.5)
+    plt.pause(0.005)
 
 node_list = []
-for node in range(5):
+for node in range(number_of_nodes):
     node_ = Node()
     node_list.append(node_)
 
 plot_positions(node_list)
 plt.cla()
-for i in range(5):
+for i in range(number_of_nodes):
 
     print(node_list[i].init_speed)
     print(node_list[i].init_position)
@@ -80,4 +87,13 @@ for i in range(5):
     node_list[i].update_position(node_list[i].init_position)
     print(node_list[i].init_speed)
     print(node_list[i].init_position)
-plot_positions(node_list)
+#plot_positions(node_list)
+
+change = 100
+for j in range(change):
+    for i in range(number_of_nodes):
+        node_list[i].update_speed(node_list[i].init_speed)
+        node_list[i].update_position(node_list[i].init_position)
+
+    plot_positions(node_list)
+    plt.cla()
