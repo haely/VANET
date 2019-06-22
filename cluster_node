@@ -3,32 +3,41 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import random
 import itertools
+import statistics
+
 speed = 5
 time = 2
-number_of_nodes = 10
+number_of_nodes = 100
+change = 13
 speed_x = speed
 speed_y = speed
 class Node(object):
     """
         Node class:
-        the attributes consist of   ID,                                 (Auto assigned, start wit 1, aito-increment by 1)
-                                    speed vector x component,           (derieved from user input)
-                                    speed vector y component,           (derieved from user input)
-                                    speed vector,                       (derieved from user input)
+        the attributes consist of   ID,                                 (Auto assigned, start with 1, auto-increment by 1)
+                                    speed vector x component,           (derived from user input)
+                                    speed vector y component,           (derived from user input)
+                                    speed vector,                       (derived from user input)
+                                    last five speed vector,             (list of last five speed vectors)
                                     time taken,                         (user input)
-                                    position vector,                    (randomly assined in range [(0,()] )
-                                    direction                           (randomlyl assigned: 1: straight, 2 up, 3 down)
+                                    position vector,                    (randomly assigned in range [(-250,250), (-250,250)]
+                                    last five position vector,          (list of last five position vectors)
+                                    direction                           (randomly assigned: 1: straight, 2 up, 3 down)
+                                    last five directions                (list of last five directions)
 
     """
-    _ID = 1
+    _ID = 1                                                              # class global ID
     def __init__(self,
                  ID = 0,
                  init_speed_x = speed_x,
                  init_speed_y = speed_y,
                  init_speed = np.array([speed_x, speed_y]),
+                 last_five_speed = list([np.array([0.0,0.0]), np.array([0.0,0.0]), np.array([0.0,0.0]), np.array([0.0,0.0]), np.array([0.0,0.0])]),
                  time_taken = time,
                  init_position = np.array([0.0,0.0]),
-                 direction = 0
+                 last_five_position = list([np.array([0.0,0.0]), np.array([0.0,0.0]), np.array([0.0,0.0]), np.array([0.0,0.0]), np.array([0.0,0.0])]),
+                 direction = 0,
+                 last_five_direction = [0,0,0,0,0]
                  ):
 
         self.ID = self._ID; self.__class__._ID += 1
@@ -36,6 +45,8 @@ class Node(object):
         self.init_speed_x = init_speed_x
         self.init_speed_y = init_speed_y
         self.init_speed = init_speed
+        self.last_five_speed = list([self.init_speed, np.array([0.0, 0.0]), np.array([0.0, 0.0]), np.array([0.0, 0.0]),
+                              np.array([0.0, 0.0])])
 
         self.time_taken = time_taken
 
@@ -43,57 +54,147 @@ class Node(object):
         init_y = random.randint(-250, 250)
         init_position = np.array([init_x, init_y])
         self.init_position = init_position
+        self.last_five_position = list([self.init_position, np.array([0.0, 0.0]), np.array([0.0, 0.0]), np.array([0.0, 0.0]),
+                              np.array([0.0, 0.0])]),
 
         direction = random.randint(1,3)
         self.direction = direction
+        self.last_five_direction = [self.direction,0,0,0,0]
 
     def update_speed(self, init_speed):
         if self.direction == 1:
-            self.init_speed_x = self.init_speed_x
+            self.init_speed_x = speed
             self.init_speed_y = 0
         if self.direction == 2:
             self.init_speed_x = 0
-            self.init_speed_y = self.init_speed_y
+            self.init_speed_y = speed
         if self.direction == 3:
             self.init_speed_x = 0
-            self.init_speed_y = (-1)*self.init_speed_y
+            self.init_speed_y = (-1)*speed
         self.init_speed = np.array([self.init_speed_x, self.init_speed_y])
-
+        self.last_five_speed.append(self.init_speed)
+        self.last_five_speed.pop(0)
     def update_position(self, init_position):
         self.init_position = self.init_position + self.init_speed*self.time_taken
+        self.last_five_position = list(self.last_five_position)
+        self.last_five_position.append(self.init_position)
+        self.last_five_position.pop(0)
 
 
 def plot_positions(list_of_node_parameters):
     for node in range(len(list_of_node_parameters)):
+        plt.xlim(-600,600)
+        plt.ylim(-600,600)
         x = list_of_node_parameters[node].init_position[0]
         y = list_of_node_parameters[node].init_position[1]
         plt.scatter(x, y)
     plt.pause(0.005)
 
+def plot_positions_last_frame(list_of_node_parameters):
+    for node in range(len(list_of_node_parameters)):
+        plt.xlim(-600, 600)
+        plt.ylim(-600, 600)
+        x = list_of_node_parameters[node].init_position[0]
+        y = list_of_node_parameters[node].init_position[1]
+        plt.scatter(x, y)
+    plt.pause(0.01)
+
+
 node_list = []
+
 for node in range(number_of_nodes):
     node_ = Node()
     node_list.append(node_)
 
-plot_positions(node_list)
-plt.cla()
-for i in range(number_of_nodes):
-
-    print(node_list[i].init_speed)
-    print(node_list[i].init_position)
-    print("new now")
-    print(node_list[i].direction)
-    node_list[i].update_speed(node_list[i].init_speed)
-    node_list[i].update_position(node_list[i].init_position)
-    print(node_list[i].init_speed)
-    print(node_list[i].init_position)
-#plot_positions(node_list)
-
-change = 100
 for j in range(change):
     for i in range(number_of_nodes):
         node_list[i].update_speed(node_list[i].init_speed)
         node_list[i].update_position(node_list[i].init_position)
-
     plot_positions(node_list)
     plt.cla()
+j = change
+if j == change:
+    for i in range(number_of_nodes):
+        node_list[i].update_speed(node_list[i].init_speed)
+        node_list[i].update_position(node_list[i].init_position)
+
+    plot_positions_last_frame(node_list)
+    #plt.cla()
+
+#################
+# clusters are now formed, change dir randomly #######
+############
+x_pos_list = []
+y_pos_list = []
+
+for i in range(number_of_nodes):
+    x_pos = node_list[i].init_position[0]
+    x_pos_list.append(x_pos)
+    y_pos = node_list[i].init_position[1]
+    y_pos_list.append(y_pos)
+
+mean_x = statistics.mean(x_pos_list)
+mean_y = statistics.mean(y_pos_list)
+median_x = statistics.median(x_pos_list)
+median_y = statistics.median(y_pos_list)
+low_median_x = statistics.median_low(x_pos_list)
+low_median_y = statistics.median_low(y_pos_list)
+high_median_x = statistics.median_high(x_pos_list)
+high_median_y = statistics.median_high(y_pos_list)
+min_x = min(x_pos_list)
+min_y = min(y_pos_list)
+max_x = max(x_pos_list)
+max_y = max(y_pos_list)
+
+"""
+print("Min x", min_x)
+print("Max x", max_x)
+print("HM x", high_median_x)
+print("LM x", low_median_x)
+print("A x", mean_x)
+print("M x", median_x)
+
+print("Min y", min_y)
+print("Max y", max_y)
+print("LM y", low_median_y)
+print("HM y", high_median_y)
+print("M y", median_y)
+print("A y", mean_y)
+"""
+
+#plt.cla()
+
+
+#print(list_of_clusters)
+list_of_clusters = node_list
+def update_clusters(list_of_nodes):
+
+
+    list_of_clusters = [[], [], [], []]
+    for i in range(number_of_nodes):
+        x = node_list[i].init_position[0]
+        y = node_list[i].init_position[1]
+
+        if x >= mean_x and y >= mean_y:
+            plt.scatter(x, y, c='y')
+            list_of_clusters[0].append(node_list[i].ID)
+
+        if x >= mean_x and y < mean_y:
+            plt.scatter(x, y, c='g')
+            list_of_clusters[1].append(node_list[i].ID)
+
+        if x < mean_x and y >= mean_y:
+            plt.scatter(x, y, c='b')
+            list_of_clusters[2].append(node_list[i].ID)
+
+        if x < mean_x and y < mean_y:
+            plt.scatter(x, y, c='r')
+            list_of_clusters[3].append(node_list[i].ID)
+
+
+    plt.pause(2)
+    plt.close('all')
+    return list_of_clusters
+update_clusters(node_list)
+print(node_list)
+print(list_of_clusters)
