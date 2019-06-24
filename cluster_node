@@ -5,12 +5,14 @@ import random
 import itertools
 import statistics
 
-speed = 5
-time = 2
-number_of_nodes = 100
-change = 13
+speed = 5                                       #user input, constant throughout here
+time = 2                                        #user input, constant throughout here, re-plot after every 't' seconds
+number_of_nodes = 100                           #user input, constant throughout here
+change = 13                                     #random number, when different clusters can be visualised and are not too far away to never interfere
 speed_x = speed
 speed_y = speed
+
+
 class Node(object):
     """
         Node class:
@@ -81,6 +83,13 @@ class Node(object):
         self.last_five_position.pop(0)
 
 
+
+"""
+    Following 2 functions plot the scatter plot for all the nodes (similar function, only the pause time varies)
+    function arg: list of nodes with every node having the parameters from the class Node
+    re-plots every 5 ms (0.005 s)
+    Function to be called after updating speed and position (function in class)  
+"""
 def plot_positions(list_of_node_parameters):
     for node in range(len(list_of_node_parameters)):
         plt.xlim(-600,600)
@@ -100,18 +109,20 @@ def plot_positions_last_frame(list_of_node_parameters):
     plt.pause(0.01)
 
 
-node_list = []
+node_list = []                         # array that contains every node with its parameters
 
 for node in range(number_of_nodes):
     node_ = Node()
     node_list.append(node_)
 
-for j in range(change):
-    for i in range(number_of_nodes):
-        node_list[i].update_speed(node_list[i].init_speed)
-        node_list[i].update_position(node_list[i].init_position)
-    plot_positions(node_list)
+for j in range(change):                                              # for as many times as we want to update, 13 here
+    for i in range(number_of_nodes):                                 # for every node
+        node_list[i].update_speed(node_list[i].init_speed)           # update speed
+        node_list[i].update_position(node_list[i].init_position)     # update position
+    plot_positions(node_list)                                        # call the plot function that replots every 5 ms
     plt.cla()
+
+# to hold the last plot longer (not necessary
 j = change
 if j == change:
     for i in range(number_of_nodes):
@@ -122,8 +133,14 @@ if j == change:
     #plt.cla()
 
 #################
-# clusters are now formed, change dir randomly #######
+# clusters are now formed #
 ############
+
+"""
+    Maintain a list of last 5 positions, directions, speed.
+    Directions now change randomly
+"""
+
 x_pos_list = []
 y_pos_list = []
 
@@ -165,10 +182,15 @@ print("A y", mean_y)
 #plt.cla()
 
 
+"""
+    create a list of clusters, every cluster is a list of node IDs in the cluster
+    current clustering parameter: average position
+    coloured accordingly
+"""
 #print(list_of_clusters)
-list_of_clusters = node_list
+list_of_clusters = [[],[],[],[]]
 def update_clusters(list_of_nodes):
-
+    list_of_nodes = node_list
 
     list_of_clusters = [[], [], [], []]
     for i in range(number_of_nodes):
@@ -176,25 +198,50 @@ def update_clusters(list_of_nodes):
         y = node_list[i].init_position[1]
 
         if x >= mean_x and y >= mean_y:
+            colour = 'y'
             plt.scatter(x, y, c='y')
             list_of_clusters[0].append(node_list[i].ID)
 
         if x >= mean_x and y < mean_y:
+            colour = 'g'
             plt.scatter(x, y, c='g')
             list_of_clusters[1].append(node_list[i].ID)
 
         if x < mean_x and y >= mean_y:
+            colour = 'b'
             plt.scatter(x, y, c='b')
             list_of_clusters[2].append(node_list[i].ID)
 
         if x < mean_x and y < mean_y:
+            colour = 'r'
             plt.scatter(x, y, c='r')
             list_of_clusters[3].append(node_list[i].ID)
 
 
     plt.pause(2)
-    plt.close('all')
+    #plt.close('all')
+    print(node_list)
+    print(len(list_of_clusters[0]))
+
     return list_of_clusters
 update_clusters(node_list)
-print(node_list)
-print(list_of_clusters)
+
+def change_directions(node):
+    #node = node_list[i]
+    new_direction = random.randint(1,3)
+    node_list[i].direction = new_direction
+    return node_list[i]
+
+for i in range(number_of_nodes):
+    node = node_list[i]
+    change_directions(node)
+
+for j in range(change):
+    for i in range(number_of_nodes):
+        node = node_list[i]
+        change_directions(node)
+        node_list[i].update_speed(node_list[i].init_speed)
+        node_list[i].update_position(node_list[i].init_position)
+    plot_positions(node_list)
+    plt.cla()
+
