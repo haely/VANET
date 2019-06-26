@@ -38,6 +38,8 @@ class Node(object):
                  time_taken = time,
                  init_position = np.array([0.0,0.0]),
                  last_five_position = list([np.array([0.0,0.0]), np.array([0.0,0.0]), np.array([0.0,0.0]), np.array([0.0,0.0]), np.array([0.0,0.0])]),
+                 last_five_x_position = [0,0,0,0,0],
+                 last_five_y_position=[0, 0, 0, 0, 0],
                  direction = 0,
                  last_five_direction = [0,0,0,0,0],
                  color = 'blue'
@@ -57,6 +59,8 @@ class Node(object):
         init_y = random.randint(-250, 250)
         init_position = np.array([init_x, init_y])
         self.init_position = init_position
+        self.last_five_x_position = [0, 0, 0, 0, 0]
+        self.last_five_y_position = [0, 0, 0, 0, 0]
         self.last_five_position = list([self.init_position, np.array([0.0, 0.0]), np.array([0.0, 0.0]), np.array([0.0, 0.0]),
                               np.array([0.0, 0.0])]),
 
@@ -87,25 +91,30 @@ class Node(object):
         self.init_position = self.init_position + self.init_speed*self.time_taken
         self.last_five_position = list(self.last_five_position)
         self.last_five_position.append(self.init_position)
+        self.last_five_x_position.append(self.init_position[0])
+        self.last_five_y_position.append(self.init_position[1])
         self.last_five_position.pop(0)
+        self.last_five_x_position.pop(0)
+        self.last_five_y_position.pop()
 
     def update_colors(self, init_position):
         x = self.init_position[0]
         y = self.init_position[1]
-        #last_five_x = self.last_five_position[0]
-        if x >= mean_x and y >= mean_y:
+        self_x_mean = statistics.mean(self.last_five_x_position)
+        self_y_mean = statistics.mean(self.last_five_y_position)
+        if self_x_mean >= mean_x and self_y_mean >= mean_y:
             self.color = 'y'
             list_of_clusters[0].append(node_list[i].ID)
 
-        if x >= mean_x and y < mean_y:
+        if self_x_mean >= mean_x and self_y_mean < mean_y:
             self.color = 'g'
             list_of_clusters[1].append(node_list[i].ID)
 
-        if x < mean_x and y >= mean_y:
+        if self_x_mean < mean_x and self_y_mean >= mean_y:
             self.color = 'm'
             list_of_clusters[2].append(node_list[i].ID)
 
-        if x < mean_x and y < mean_y:
+        if self_x_mean < mean_x and self_y_mean < mean_y:
             self.color = 'r'
             list_of_clusters[3].append(node_list[i].ID)
 
