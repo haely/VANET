@@ -95,7 +95,7 @@ class Node(object):
         self.last_five_y_position.append(self.init_position[1])
         self.last_five_position.pop(0)
         self.last_five_x_position.pop(0)
-        self.last_five_y_position.pop()
+        self.last_five_y_position.pop(0)
 
     def update_colors(self, init_position):
         x = self.init_position[0]
