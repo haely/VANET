@@ -5,14 +5,20 @@ import random
 import itertools
 import statistics
 
-speed = 3                                       #user input, constant throughout here
+speed = 5                                       #user input, constant throughout here
 time = 2                                        #user input, constant throughout here, re-plot after every 't' seconds
-number_of_nodes = 100                           #user input, constant throughout here
-change = 20                                     #random number, when different clusters can be visualised and are not too far away to never interfere
+number_of_nodes = 30                            #user input, constant throughout here
+change = 20                                      #random number, when different clusters can be visualised and are not too far away to never interfere
 speed_x = speed
 speed_y = speed
 
-
+list_of_clusters = [[], [], [], []]
+y_cluster = []
+y_cluster_ = []
+g_cluster = []
+m_cluster = []
+r_cluster = []
+head_list = []
 class Node(object):
     """
         Node class:
@@ -24,9 +30,11 @@ class Node(object):
                                     time taken,                         (user input)
                                     position vector,                    (randomly assigned in range [(-250,250), (-250,250)]
                                     last five position vector,          (list of last five position vectors)
+                                    last five x position                (list of last five x position vectors)
+                                    last five y position                (list of last five y position vectors)
                                     direction                           (randomly assigned: 1: straight, 2 up, 3 down)
                                     last five directions                (list of last five directions)
-                                    color                              (all nodes start with colour blue)
+                                    color                               (all nodes start with colour blue)
     """
     _ID = 1                                                              # class global ID
     def __init__(self,
@@ -102,21 +110,36 @@ class Node(object):
         y = self.init_position[1]
         self_x_mean = statistics.mean(self.last_five_x_position)
         self_y_mean = statistics.mean(self.last_five_y_position)
+
+
         if self_x_mean >= mean_x and self_y_mean >= mean_y:
             self.color = 'y'
-            list_of_clusters[0].append(node_list[i].ID)
+            #y_cluster.append(node_list[i].ID)
 
         if self_x_mean >= mean_x and self_y_mean < mean_y:
             self.color = 'g'
-            list_of_clusters[1].append(node_list[i].ID)
+            #g_cluster.append(node_list[i].ID)
 
         if self_x_mean < mean_x and self_y_mean >= mean_y:
             self.color = 'm'
-            list_of_clusters[2].append(node_list[i].ID)
+            #m_cluster.append(node_list[i].ID)
 
         if self_x_mean < mean_x and self_y_mean < mean_y:
             self.color = 'r'
-            list_of_clusters[3].append(node_list[i].ID)
+            #r_cluster.append(node_list[i].ID)
+
+        #return y_cluster, g_cluster, m_cluster, r_cluster
+
+
+
+    def update_directions(self, direction):
+        direction = self.direction
+        direction = random.randint(1,4)
+        self.direction = direction
+        #return node_list[i]
+
+
+
 
 
 
@@ -130,8 +153,8 @@ class Node(object):
 """
 def plot_positions(list_of_node_parameters):
     for node in range(len(list_of_node_parameters)):
-        plt.xlim(-600,600)
-        plt.ylim(-600,600)
+        plt.xlim(-500,500)
+        plt.ylim(-500,500)
         x = list_of_node_parameters[node].init_position[0]
         y = list_of_node_parameters[node].init_position[1]
         color = list_of_node_parameters[node].color
@@ -139,6 +162,44 @@ def plot_positions(list_of_node_parameters):
     plt.pause(0.005)
 
 
+def average_fn(z_list):
+    z_mean = statistics.mean(z_list)
+    return z_mean
+
+
+def form_clusters(node):
+    if node.color == 'y':
+        if node.ID in y_cluster:
+            pass
+        else:
+            y_cluster.append(node.ID)
+    if node.color == 'g':
+        if node.ID in g_cluster:
+            pass
+        else:
+            g_cluster.append(node.ID)
+    if node.color == 'm':
+        if node.ID in m_cluster:
+            pass
+        else:
+            m_cluster.append(node.ID)
+    if node.color == 'r':
+        if node.ID in r_cluster:
+            pass
+        else:
+            r_cluster.append(node.ID)
+    list_of_clusters = [y_cluster, r_cluster, m_cluster, g_cluster]
+    return list_of_clusters
+
+def assign_head(list_of_clusters):
+    y_head = min(list_of_clusters[0])
+    g_head = min(list_of_clusters[1])
+    m_head = min(list_of_clusters[2])
+    r_head = min(list_of_clusters[3])
+    head_list = [y_head, g_head, m_head, r_head]
+    if node.ID in head_list:
+        node.color = 'cyan'
+    return [y_head, g_head, m_head, r_head]
 
 
 node_list = []                                                     # array that contains every node with its parameters
@@ -174,55 +235,71 @@ for i in range(number_of_nodes):
     y_pos_list.append(y_pos)
 
 
-
-def average_fn(z_list):
-    z_mean = statistics.mean(z_list)
-    return z_mean
-
-
-
 """
     create a list of clusters, every cluster is a list of node IDs in the cluster
     current clustering parameter: average position
     coloured accordingly
 """
 
-list_of_clusters = [[],[],[],[]]
 
 
 mean_x = average_fn(x_pos_list)
 mean_y = average_fn(y_pos_list)
+temp = []
 for j in range(change):                                              # for as many times as we want to update, 13 here
     for i in range(number_of_nodes):                                 # for every node
-        node_list[i].update_colors(node_list[i].init_position)           # update speed
+        node_ = node_list[i]
+
     plot_positions(node_list)                                        # call the plot function that replots every 5 ms
+
     plt.cla()
 
-
-def change_directions(node):
-    new_direction = random.randint(1,4)
-    node_list[i].direction = new_direction
-    return node_list[i]
 x_pos_list = []
 y_pos_list = []
 
 """
     once the clusters are formed, nodes randomly change directions and based on the average position,
-    clusters are reassigned/maintained
-    
+    clusters are reassigned/maintained 
 """
-for j in range(10*change):
+for j in range(change):
     for i in range(number_of_nodes):
         x_pos = node_list[i].init_position[0]
-        x_pos_list.append(x_pos)
         y_pos = node_list[i].init_position[1]
-        y_pos_list.append(y_pos)
         node = node_list[i]
-        change_directions(node)
+        node_list[i].update_directions(node_list[i].direction)
 
         node_list[i].update_speed(node_list[i].init_speed)
         node_list[i].update_position(node_list[i].init_position)
         node_list[i].update_colors(node_list[i].init_position)
+        my_clusters = form_clusters(node_list[i])
+
+        x_pos = node_list[i].init_position[0]
+        x_pos_list.append(x_pos)
+        y_pos = node_list[i].init_position[1]
+        y_pos_list.append(y_pos)
+    mean_x = average_fn(x_pos_list)
+    mean_y = average_fn(y_pos_list)
+
+    plot_positions(node_list)
+    plt.cla()
+my_heads = assign_head(my_clusters)
+
+
+
+for j in range(10*change):
+    for i in range(number_of_nodes):
+        x_pos = node_list[i].init_position[0]
+        y_pos = node_list[i].init_position[1]
+        node = node_list[i]
+        node_list[i].update_directions(node_list[i].direction)
+
+        node_list[i].update_speed(node_list[i].init_speed)
+        node_list[i].update_position(node_list[i].init_position)
+        if node_list[i].ID not in my_heads:
+            node_list[i].update_colors(node_list[i].init_position)
+            my_clusters = form_clusters(node_list[i])
+        else:
+            node_list[i].color = 'cyan'
         x_pos = node_list[i].init_position[0]
         x_pos_list.append(x_pos)
         y_pos = node_list[i].init_position[1]
@@ -233,3 +310,5 @@ for j in range(10*change):
     plot_positions(node_list)
     plt.cla()
 
+print(my_clusters)
+print(my_heads)
