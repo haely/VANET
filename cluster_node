@@ -8,7 +8,7 @@ import statistics
 speed = 5                                       #user input, constant throughout here
 time = 2                                        #user input, constant throughout here, re-plot after every 't' seconds
 number_of_nodes = 30                            #user input, constant throughout here
-change = 20                                      #random number, when different clusters can be visualised and are not too far away to never interfere
+change = 8                                      #random number, when different clusters can be visualised and are not too far away to never interfere
 speed_x = speed
 speed_y = speed
 
@@ -191,16 +191,45 @@ def form_clusters(node):
     list_of_clusters = [y_cluster, r_cluster, m_cluster, g_cluster]
     return list_of_clusters
 
+
+
+x_pos_cluster = []
+y_pos_cluster = []
+
+
+def elect_head(cluster):
+    print(cluster)
+    head_id = -1
+    lowest_dev_product = 1000000
+    for i in range(len(cluster)):
+        node_id = int(cluster[i]-1)
+        x_pos_cluster.append(node_list[node_id].init_position[0])
+        y_pos_cluster.append(node_list[node_id].init_position[1])
+    x_pos_cluster_avg = statistics.mean(x_pos_cluster)
+    y_pos_cluster_avg = statistics.mean(y_pos_cluster)
+    for i in range(len(cluster)):
+        node_id = int(cluster[i]-1)
+        x_dev = abs(node_list[node_id].init_position[0] - x_pos_cluster_avg)
+        y_dev = abs(node_list[node_id].init_position[1] - y_pos_cluster_avg)
+        dev_product = (x_dev * y_dev)/100
+        if dev_product <= lowest_dev_product:
+            head_id = node_id+1
+            lowest_dev_product = dev_product
+        else:
+            lowest_dev_product = lowest_dev_product
+            head_id = head_id
+    return head_id
+
+
 def assign_head(list_of_clusters):
-    y_head = min(list_of_clusters[0])
-    g_head = min(list_of_clusters[1])
-    m_head = min(list_of_clusters[2])
-    r_head = min(list_of_clusters[3])
+    y_head = elect_head(list_of_clusters[0])
+    g_head = elect_head(list_of_clusters[1])
+    m_head = elect_head(list_of_clusters[2])
+    r_head = elect_head(list_of_clusters[3])
     head_list = [y_head, g_head, m_head, r_head]
     if node.ID in head_list:
         node.color = 'cyan'
-    return [y_head, g_head, m_head, r_head]
-
+    return head_list
 
 node_list = []                                                     # array that contains every node with its parameters
 
@@ -310,5 +339,5 @@ for j in range(10*change):
     plot_positions(node_list)
     plt.cla()
 
-print(my_clusters)
+
 print(my_heads)
