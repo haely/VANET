@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import math
 import matplotlib.pyplot as plt
 import random
 import itertools
@@ -8,7 +9,7 @@ import statistics
 speed = 5                                       #user input, constant throughout here
 time = 2                                        #user input, constant throughout here, re-plot after every 't' seconds
 number_of_nodes = 30                            #user input, constant throughout here
-change = 8                                      #random number, when different clusters can be visualised and are not too far away to never interfere
+change = 18                                      #random number, when different clusters can be visualised and are not too far away to never interfere
 speed_x = speed
 speed_y = speed
 
@@ -200,7 +201,7 @@ y_pos_cluster = []
 def elect_head(cluster):
     print(cluster)
     head_id = -1
-    lowest_dev_product = 1000000
+    lowest_dist = 1000000
     for i in range(len(cluster)):
         node_id = int(cluster[i]-1)
         x_pos_cluster.append(node_list[node_id].init_position[0])
@@ -209,14 +210,14 @@ def elect_head(cluster):
     y_pos_cluster_avg = statistics.mean(y_pos_cluster)
     for i in range(len(cluster)):
         node_id = int(cluster[i]-1)
-        x_dev = abs(node_list[node_id].init_position[0] - x_pos_cluster_avg)
-        y_dev = abs(node_list[node_id].init_position[1] - y_pos_cluster_avg)
-        dev_product = (x_dev * y_dev)/100
-        if dev_product <= lowest_dev_product:
+        x_dev_sq = (node_list[node_id].init_position[0] - x_pos_cluster_avg)**2
+        y_dev_sq = (node_list[node_id].init_position[1] - y_pos_cluster_avg)**2
+        node_dist = math.sqrt(x_dev_sq + y_dev_sq)/100
+        if node_dist <= lowest_dist:
             head_id = node_id+1
-            lowest_dev_product = dev_product
+            lowest_dist = node_dist
         else:
-            lowest_dev_product = lowest_dev_product
+            lowest_dist = lowest_dist
             head_id = head_id
     return head_id
 
@@ -315,7 +316,7 @@ my_heads = assign_head(my_clusters)
 
 
 
-for j in range(10*change):
+for j in range(change):
     for i in range(number_of_nodes):
         x_pos = node_list[i].init_position[0]
         y_pos = node_list[i].init_position[1]
