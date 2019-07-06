@@ -204,16 +204,16 @@ def elect_head(cluster):
     lowest_dist = 1000000
     for i in range(len(cluster)):
         node_id = int(cluster[i]-1)                      # node id is actually node index, should probably change original ids
-        node_avg_x = statistics.mean(node_list[node_id].last_five_x_position)
-        node_avg_y = statistics.mean(node_list[node_id].last_five_y_position)
-        x_pos_cluster.append(node_avg_x)
-        y_pos_cluster.append(node_avg_y)
+        node_x = node_list[node_id].init_position[0]
+        node_y = node_list[node_id].init_position[1]
+        x_pos_cluster.append(node_x)
+        y_pos_cluster.append(node_y)
     x_pos_cluster_avg = statistics.mean(x_pos_cluster)
     y_pos_cluster_avg = statistics.mean(y_pos_cluster)
     for i in range(len(cluster)):
         node_id = int(cluster[i]-1)
-        x_dev_sq = (node_list[node_id].init_position[0] - x_pos_cluster_avg)**2
-        y_dev_sq = (node_list[node_id].init_position[1] - y_pos_cluster_avg)**2
+        x_dev_sq = (statistics.mean(node_list[node_id].last_five_x_position) - x_pos_cluster_avg)**2
+        y_dev_sq = (statistics.mean(node_list[node_id].last_five_x_position) - y_pos_cluster_avg)**2
         node_dist = math.sqrt(x_dev_sq + y_dev_sq)/100
         if node_dist <= lowest_dist:
             head_id = node_id+1
