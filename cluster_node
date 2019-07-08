@@ -51,7 +51,8 @@ class Node(object):
                  last_five_y_position=[0, 0, 0, 0, 0],
                  direction = 0,
                  last_five_direction = [0,0,0,0,0],
-                 color = 'blue'
+                 color = 'blue',
+                 marker = '.'
                  ):
 
         self.ID = self._ID; self.__class__._ID += 1
@@ -78,6 +79,7 @@ class Node(object):
         self.last_five_direction = [self.direction,0,0,0,0]
 
         self.color = str('blue')
+        self.marker = str('.')
 
     def update_speed(self, init_speed):
         if self.direction == 1:
@@ -159,8 +161,11 @@ def plot_positions(list_of_node_parameters):
         x = list_of_node_parameters[node].init_position[0]
         y = list_of_node_parameters[node].init_position[1]
         color = list_of_node_parameters[node].color
-        plt.scatter(x, y, c=color)
+        node_marker = list_of_node_parameters[node].marker
+        plt.scatter(x, y, c=color,marker=node_marker)
     plt.pause(0.005)
+
+
 
 
 def average_fn(z_list):
@@ -231,7 +236,8 @@ def assign_head(list_of_clusters):
     r_head = elect_head(list_of_clusters[3])
     head_list = [y_head, g_head, m_head, r_head]
     if node.ID in head_list:
-        node.color = 'cyan'
+        #node.color = 'cyan'
+        node.marker = 's'
     return head_list
 
 node_list = []                                                      # array that contains every node with its parameters
@@ -359,7 +365,8 @@ for j in range(10*change):
             node_list[i].update_colors(node_list[i].init_position)
             my_clusters = form_clusters(node_list[i])
         else:
-            node_list[i].color = 'cyan'
+            #node_list[i].color = 'cyan'
+            node_list[i].marker = 's'
         x_pos = node_list[i].init_position[0]
         x_pos_list.append(x_pos)
         y_pos = node_list[i].init_position[1]
