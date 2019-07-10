@@ -36,6 +36,7 @@ class Node(object):
                                     direction                           (randomly assigned: 1: straight, 2 up, 3 down)
                                     last five directions                (list of last five directions)
                                     color                               (all nodes start with colour blue)
+                                    marker                              (all nodes start with '.' and heads are promoted to 's
     """
     _ID = 1                                                              # class global ID
     def __init__(self,
@@ -201,6 +202,8 @@ def form_clusters(node):
 
 x_pos_cluster = []
 y_pos_cluster = []
+dir_cluster = []
+
 
 
 def elect_head(cluster):
@@ -209,18 +212,23 @@ def elect_head(cluster):
     lowest_dist = 1000000
     for i in range(len(cluster)):
         node_id = int(cluster[i]-1)                      # node id is actually node index, should probably change original ids
-        node_x = node_list[node_id].init_position[0]
-        node_y = node_list[node_id].init_position[1]
-        x_pos_cluster.append(node_x)
-        y_pos_cluster.append(node_y)
+        last_node_x = node_list[node_id].init_position[0]
+        last_node_y = node_list[node_id].init_position[1]
+        dir_node = node_list[node_id].direction
+        x_pos_cluster.append(last_node_x)
+        y_pos_cluster.append(last_node_y)
+        dir_cluster.append(dir_node)
     x_pos_cluster_avg = statistics.mean(x_pos_cluster)
     y_pos_cluster_avg = statistics.mean(y_pos_cluster)
+    dir_cluster_avg = statistics.mean(dir_cluster)
     for i in range(len(cluster)):
         node_id = int(cluster[i]-1)
         x_dev_sq = (statistics.mean(node_list[node_id].last_five_x_position) - x_pos_cluster_avg)**2
         y_dev_sq = (statistics.mean(node_list[node_id].last_five_x_position) - y_pos_cluster_avg)**2
         node_dist = math.sqrt(x_dev_sq + y_dev_sq)/100
-        if node_dist <= lowest_dist:
+        node_dir_avg = (statistics.mean(node_list[node_id].last_five_direction) - dir_cluster_avg)
+
+        if (node_dir_avg*node_dist) <= lowest_dist:
             head_id = node_id+1
             lowest_dist = node_dist
         else:
@@ -305,7 +313,7 @@ for j in range(change//change):
         node_list[i].update_speed(node_list[i].init_speed)
         node_list[i].update_position(node_list[i].init_position)
         node_list[i].update_colors(node_list[i].init_position)
-        my_clusters = form_clusters(node_list[i])
+
 
         x_pos = node_list[i].init_position[0]
         x_pos_list.append(x_pos)
@@ -317,42 +325,12 @@ for j in range(change//change):
     plot_positions(node_list)
 
     plt.cla()
-
-
+for i in range(number_of_nodes):
+    node = node_list[i]
+    my_clusters = form_clusters(node_list[i])
 my_heads = assign_head(my_clusters)
 
-
-"""
-    once the clusters are formed, nodes randomly change directions and based on the average position,
-    clusters are reassigned/maintained 
-
-for j in range(change):
-    for i in range(number_of_nodes):
-        x_pos = node_list[i].init_position[0]
-        y_pos = node_list[i].init_position[1]
-        node = node_list[i]
-        node_list[i].update_directions(node_list[i].direction)
-
-        node_list[i].update_speed(node_list[i].init_speed)
-        node_list[i].update_position(node_list[i].init_position)
-        node_list[i].update_colors(node_list[i].init_position)
-        my_clusters = form_clusters(node_list[i])
-
-        x_pos = node_list[i].init_position[0]
-        x_pos_list.append(x_pos)
-        y_pos = node_list[i].init_position[1]
-        y_pos_list.append(y_pos)
-    mean_x = average_fn(x_pos_list)
-    mean_y = average_fn(y_pos_list)
-
-    plot_positions(node_list)
-    plt.cla()
-    #plt.pause(10)
-
-"""
-#my_heads = assign_head(my_clusters)
-
-for j in range(10*change):
+for j in range(5*change):
     for i in range(number_of_nodes):
         x_pos = node_list[i].init_position[0]
         y_pos = node_list[i].init_position[1]
@@ -363,7 +341,7 @@ for j in range(10*change):
         node_list[i].update_position(node_list[i].init_position)
         if node_list[i].ID not in my_heads:
             node_list[i].update_colors(node_list[i].init_position)
-            my_clusters = form_clusters(node_list[i])
+            #my_clusters = form_clusters(node_list[i])
         else:
             #node_list[i].color = 'cyan'
             node_list[i].marker = 's'
