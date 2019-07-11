@@ -375,7 +375,7 @@ for j in range(5*change):
 
             #node_list[i].color = 'cyan'
             #node_list[i].update_colors(node_list[i].init_position)
-            if statistics.mean(node_list[i].last_five_direction) > 3:
+            if statistics.mean(node_list[i].last_five_x_position) > 50:
                 node_list[i].color = 'blue'
             else:
                 node_list[i].color = 'cyan'
