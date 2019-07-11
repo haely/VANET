@@ -14,11 +14,11 @@ speed_x = speed
 speed_y = speed
 
 list_of_clusters = [[], [], [], []]
-y_cluster = []
+cluster1 = []
 y_cluster_ = []
-g_cluster = []
-m_cluster = []
-r_cluster = []
+cluster2 = []
+cluster3 = []
+cluster4 = []
 head_list = []
 class Node(object):
     """
@@ -36,7 +36,8 @@ class Node(object):
                                     direction                           (randomly assigned: 1: straight, 2 up, 3 down)
                                     last five directions                (list of last five directions)
                                     color                               (all nodes start with colour blue)
-                                    marker                              (all nodes start with '.' and heads are promoted to 's
+                                    marker                              (all nodes start with '.' and heads are promoted to 's'
+                                    edgecolors                          (all nodes start with no edgeg color, heads that form a cluser have the same edge color)
     """
     _ID = 1                                                              # class global ID
     def __init__(self,
@@ -53,7 +54,8 @@ class Node(object):
                  direction = 0,
                  last_five_direction = [0,0,0,0,0],
                  color = 'blue',
-                 marker = '.'
+                 marker = '.',
+                 edgecolors = 'none'
                  ):
 
         self.ID = self._ID; self.__class__._ID += 1
@@ -81,6 +83,7 @@ class Node(object):
 
         self.color = str('blue')
         self.marker = str('.')
+        self.edgecolors = str('none')
 
     def update_speed(self, init_speed):
         if self.direction == 1:
@@ -117,36 +120,18 @@ class Node(object):
 
 
         if self_x_mean >= mean_x and self_y_mean >= mean_y:
-            self.color = 'y'
-            #y_cluster.append(node_list[i].ID)
-
-        if self_x_mean >= mean_x and self_y_mean < mean_y:
-            self.color = 'g'
-            #g_cluster.append(node_list[i].ID)
-
+            self.color = 'gold'
         if self_x_mean < mean_x and self_y_mean >= mean_y:
-            self.color = 'm'
-            #m_cluster.append(node_list[i].ID)
-
+            self.color = 'mediumaquamarine'
+        if self_x_mean >= mean_x and self_y_mean < mean_y:
+            self.color = 'yellowgreen'
         if self_x_mean < mean_x and self_y_mean < mean_y:
-            self.color = 'r'
-            #r_cluster.append(node_list[i].ID)
-
-        #return y_cluster, g_cluster, m_cluster, r_cluster
-
-
+            self.color = 'darksalmon'
 
     def update_directions(self, direction):
         direction = self.direction
         direction = random.randint(1,4)
         self.direction = direction
-        #return node_list[i]
-
-
-
-
-
-
 
 
 """
@@ -155,6 +140,8 @@ class Node(object):
     re-plots every 5 ms (0.005 s)
     Function to be called after updating speed and position (function in class)  
 """
+
+
 def plot_positions(list_of_node_parameters):
     for node in range(len(list_of_node_parameters)):
         plt.xlim(-600,600)
@@ -163,10 +150,9 @@ def plot_positions(list_of_node_parameters):
         y = list_of_node_parameters[node].init_position[1]
         color = list_of_node_parameters[node].color
         node_marker = list_of_node_parameters[node].marker
-        plt.scatter(x, y, c=color,marker=node_marker)
+        node_edgecolor = list_of_node_parameters[node].edgecolors
+        plt.scatter(x, y, c=color, marker=node_marker, edgecolors=node_edgecolor)
     plt.pause(0.005)
-
-
 
 
 def average_fn(z_list):
@@ -175,27 +161,30 @@ def average_fn(z_list):
 
 
 def form_clusters(node):
-    if node.color == 'y':
-        if node.ID in y_cluster:
+    if node.color == 'gold':
+        if node.ID in cluster1:
             pass
         else:
-            y_cluster.append(node.ID)
-    if node.color == 'g':
-        if node.ID in g_cluster:
+            cluster1.append(node.ID)
+
+    if node.color == 'mediumaquamarine':
+        if node.ID in cluster2:
             pass
         else:
-            g_cluster.append(node.ID)
-    if node.color == 'm':
-        if node.ID in m_cluster:
+            cluster2.append(node.ID)
+    if node.color == 'darksalmon':
+        if node.ID in cluster3:
             pass
         else:
-            m_cluster.append(node.ID)
-    if node.color == 'r':
-        if node.ID in r_cluster:
+            cluster3.append(node.ID)
+
+    if node.color == 'yellowgreen':
+        if node.ID in cluster4:
             pass
         else:
-            r_cluster.append(node.ID)
-    list_of_clusters = [y_cluster, r_cluster, m_cluster, g_cluster]
+            cluster4.append(node.ID)
+
+    list_of_clusters = [cluster1, cluster2, cluster3, cluster4]
     return list_of_clusters
 
 
@@ -238,13 +227,12 @@ def elect_head(cluster):
 
 
 def assign_head(list_of_clusters):
-    y_head = elect_head(list_of_clusters[0])
-    g_head = elect_head(list_of_clusters[1])
-    m_head = elect_head(list_of_clusters[2])
-    r_head = elect_head(list_of_clusters[3])
-    head_list = [y_head, g_head, m_head, r_head]
+    head1 = elect_head(list_of_clusters[0])
+    head2 = elect_head(list_of_clusters[1])
+    head3 = elect_head(list_of_clusters[2])
+    head4 = elect_head(list_of_clusters[3])
+    head_list = [head1, head2, head3, head4]
     if node.ID in head_list:
-        #node.color = 'cyan'
         node.marker = 's'
     return head_list
 
@@ -372,9 +360,9 @@ for j in range(5*change):
             node_list[i].update_colors(node_list[i].init_position)
         else:
             if statistics.mean(node_list[i].last_five_x_position) > 50:
-                node_list[i].color = 'blue'
+                node_list[i].edgecolors = 'red'
             else:
-                node_list[i].color = 'cyan'
+                node_list[i].edgecolors = 'blue'
             node_list[i].marker = 's'
 
         x_pos = node_list[i].init_position[0]
