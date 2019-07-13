@@ -44,7 +44,7 @@ import statistics
 speed = 4                                        # user input, constant throughout here
 time = 2                                         # user input, constant throughout here, re-plot after every 't' seconds
 number_of_nodes = 50                             # user input, constant throughout here
-change = 18                                      # random number, when different clusters can be visualised and are not too far away to never interfere
+change = 20                                      # random number, when different clusters can be visualised and are not too far away to never interfere
 speed_x = speed
 speed_y = speed
 
@@ -196,27 +196,16 @@ def average_fn(z_list):
 
 def form_clusters(node):
     if node.color == 'gold':
-        if node.ID in cluster1:
-            pass
-        else:
-            cluster1.append(node.ID)
+        cluster1.append(node.ID)
 
     if node.color == 'deepskyblue':
-        if node.ID in cluster2:
-            pass
-        else:
-            cluster2.append(node.ID)
+        cluster2.append(node.ID)
+
     if node.color == 'darksalmon':
-        if node.ID in cluster3:
-            pass
-        else:
-            cluster3.append(node.ID)
+        cluster3.append(node.ID)
 
     if node.color == 'yellowgreen':
-        if node.ID in cluster4:
-            pass
-        else:
-            cluster4.append(node.ID)
+        cluster4.append(node.ID)
 
     list_of_clusters = [cluster1, cluster2, cluster3, cluster4]
     return list_of_clusters
@@ -232,7 +221,7 @@ dir_cluster = []
 def elect_head(cluster):
     print(cluster)
     head_id = -1
-    lowest_dist = 1000000
+    lowest_dist = 10**5
     for i in range(len(cluster)):
         node_id = int(cluster[i]-1)                      # node id is actually node index, should probably change original ids
         last_node_x = node_list[node_id].init_position[0]
@@ -248,12 +237,12 @@ def elect_head(cluster):
         node_id = int(cluster[i]-1)
         x_dev_sq = (statistics.mean(node_list[node_id].last_five_x_position) - x_pos_cluster_avg)**2
         y_dev_sq = (statistics.mean(node_list[node_id].last_five_x_position) - y_pos_cluster_avg)**2
-        node_dist = math.sqrt(x_dev_sq + y_dev_sq)/100
-        node_dir_avg = (statistics.mean(node_list[node_id].last_five_direction) - dir_cluster_avg)
+        node_dist = math.sqrt(x_dev_sq + y_dev_sq)
+        node_dir_avg = abs(node_list[node_id].direction - dir_cluster_avg)
 
         if (node_dir_avg*node_dist) <= lowest_dist:
             head_id = node_id+1
-            lowest_dist = node_dist
+            lowest_dist = node_dist*node_dir_avg
         else:
             lowest_dist = lowest_dist
             head_id = head_id
@@ -350,6 +339,8 @@ for j in range(change//change):
 for i in range(number_of_nodes):
     node = node_list[i]
     VANET_clusters = form_clusters(node_list[i])
+
+print(VANET_clusters)
 VANET_heads = assign_head(VANET_clusters)
 
 for j in range(5*change):
@@ -393,7 +384,7 @@ for j in range(5*change):
         if node_list[i].ID not in VANET_heads:
             node_list[i].update_colors(node_list[i].init_position)
         else:
-            if statistics.mean(node_list[i].last_five_x_position) > 5:
+            if statistics.mean(node_list[i].last_five_x_position) > 50:
                 node_list[i].edgecolors = 'red'
             else:
                 node_list[i].edgecolors = 'blue'
