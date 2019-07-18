@@ -298,14 +298,26 @@ plot_update_for(change)
     Directions now change randomly
 """
 
-x_pos_list = []
-y_pos_list = []
+def node_pos_list(list_of_node_ids):  # id_of_node is a list of node ids
+    x_pos_list = []
+    y_pos_list = []
+    pos_list= []
+    for i in list_of_node_ids:
+        x_pos = node_list[i-1].init_position[0]
+        x_pos_list.append(x_pos)
+        y_pos = node_list[i-1].init_position[1]
+        y_pos_list.append(y_pos)
+    pos_list = [x_pos_list, y_pos_list]
+    return pos_list
 
+id_list = []
 for i in range(number_of_nodes):
-    x_pos = node_list[i].init_position[0]
-    x_pos_list.append(x_pos)
-    y_pos = node_list[i].init_position[1]
-    y_pos_list.append(y_pos)
+    curr_id = node_list[i].ID
+    id_list.append(curr_id)
+node_positions = node_pos_list(id_list)
+x_pos_list = node_positions[0]
+y_pos_list = node_positions[1]
+
 
 
 """
@@ -314,44 +326,32 @@ for i in range(number_of_nodes):
     coloured accordingly
 """
 
+def update_pos_n_plot(list_of_node_ids):
 
+    #mean_x = average_fn(x_pos_list)
+    #mean_y = average_fn(y_pos_list)
+    for i in list_of_node_ids:
+        node_index = i-1
+        node_list[node_index].update_speed(node_list[node_index].init_speed)
+        node_list[node_index].update_position(node_list[node_index].init_position)
+        node_list[node_index].update_colors(node_list[node_index].init_position)
 
-mean_x = average_fn(x_pos_list)
-mean_y = average_fn(y_pos_list)
-temp = []
-for j in range(change):                                              # for as many times as we want to update, 13 here
-    for i in range(number_of_nodes):                                 # for every node
-        node_ = node_list[i]
+        node_positions = node_pos_list(list_of_node_ids)
+        x_pos_list = node_positions[0]
+        y_pos_list = node_positions[1]
 
-    plot_positions(node_list)                                        # call the plot function that replots every 5 ms
-
-    plt.cla()
-
-x_pos_list = []
-y_pos_list = []
-
-for j in range(change//change):
-    for i in range(number_of_nodes):
-        x_pos = node_list[i].init_position[0]
-        y_pos = node_list[i].init_position[1]
-        node = node_list[i]
-
-
-        node_list[i].update_speed(node_list[i].init_speed)
-        node_list[i].update_position(node_list[i].init_position)
-        node_list[i].update_colors(node_list[i].init_position)
-
-
-        x_pos = node_list[i].init_position[0]
-        x_pos_list.append(x_pos)
-        y_pos = node_list[i].init_position[1]
-        y_pos_list.append(y_pos)
     mean_x = average_fn(x_pos_list)
     mean_y = average_fn(y_pos_list)
-
     plot_positions(node_list)
-
     plt.cla()
+
+for j in range(change):
+    mean_x = average_fn(x_pos_list)
+    mean_y = average_fn(y_pos_list)
+    update_pos_n_plot(id_list)
+
+
+
 for i in range(number_of_nodes):
     node = node_list[i]
     VANET_clusters = form_clusters(node_list[i])
