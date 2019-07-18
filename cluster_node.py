@@ -44,7 +44,7 @@ import statistics
 speed = 4                                        # user input, constant throughout here
 time = 2                                         # user input, constant throughout here, re-plot after every 't' seconds
 number_of_nodes = 50                             # user input, constant throughout here
-change = 20                                      # random number, when different clusters can be visualised and are not too far away to never interfere
+change = 7                                       # random number, when different clusters can be visualised and are not too far away to never interfere
 speed_x = speed
 speed_y = speed
 
@@ -259,18 +259,34 @@ def assign_head(list_of_clusters):
         node.marker = 's'
     return head_list
 
+
+"""
 node_list = []                                                      # array that contains every node with its parameters
 
 for node in range(number_of_nodes):
     node_ = Node()
     node_list.append(node_)
+"""
+def init_node(total_nodes):
+    node_list = []  # array that contains every node with its parameters
 
-for j in range(change):                                              # for as many times as we want to update, 13 here
-    for i in range(number_of_nodes):                                 # for every node
-        node_list[i].update_speed(node_list[i].init_speed)           # update speed
-        node_list[i].update_position(node_list[i].init_position)     # update position
-    plot_positions(node_list)                                        # call the plot function that replots every 5 ms
-    plt.cla()
+    for node in range(total_nodes):
+        node_ = Node()
+        node_list.append(node_)
+    return node_list
+
+def plot_update_for(num_updates):
+    change = num_updates
+    for j in range(change):  # for as many times as we want to update, 13 here
+        for i in range(number_of_nodes):  # for every node
+            node_list[i].update_speed(node_list[i].init_speed)  # update speed
+            node_list[i].update_position(node_list[i].init_position)  # update position
+        plot_positions(node_list)  # call the plot function that replots every 5 ms
+        plt.cla()
+
+
+node_list = init_node(number_of_nodes)
+plot_update_for(change)
 
 
 #################
@@ -399,3 +415,4 @@ for j in range(5*change):
 
     plot_positions(node_list)
     plt.cla()
+
