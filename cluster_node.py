@@ -327,27 +327,21 @@ y_pos_list = node_positions[1]
 """
 
 def update_pos_n_plot(list_of_node_ids):
-
-    #mean_x = average_fn(x_pos_list)
-    #mean_y = average_fn(y_pos_list)
     for i in list_of_node_ids:
         node_index = i-1
         node_list[node_index].update_speed(node_list[node_index].init_speed)
         node_list[node_index].update_position(node_list[node_index].init_position)
         node_list[node_index].update_colors(node_list[node_index].init_position)
-
-        node_positions = node_pos_list(list_of_node_ids)
-        x_pos_list = node_positions[0]
-        y_pos_list = node_positions[1]
-
-    mean_x = average_fn(x_pos_list)
-    mean_y = average_fn(y_pos_list)
     plot_positions(node_list)
     plt.cla()
+
 
 for j in range(change):
     mean_x = average_fn(x_pos_list)
     mean_y = average_fn(y_pos_list)
+    node_positions = node_pos_list(id_list)
+    x_pos_list = node_positions[0]
+    y_pos_list = node_positions[1]
     update_pos_n_plot(id_list)
 
 
@@ -358,6 +352,7 @@ for i in range(number_of_nodes):
 
 print(VANET_clusters)
 VANET_heads = assign_head(VANET_clusters)
+
 
 for j in range(5*change):
     for i in range(number_of_nodes):
