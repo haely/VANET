@@ -278,7 +278,6 @@ dir_cluster = []
 
 
 def elect_head(cluster, list_of_nodes):
-    print(cluster)
     head_id = -1
     lowest_dist = 10**5
     for i in range(len(cluster)):
@@ -341,7 +340,12 @@ for j in range(5*change):
         node_list[i].update_position(node_list[i].init_position)
         if node_list[i].ID not in VANET_heads:
             node_list[i].update_colors(node_list[i].init_position)
+            node_list[i].edgecolors = 'none'
         else:
+            if statistics.mean(node_list[i].last_five_x_position) > 50:
+                node_list[i].edgecolors = 'red'
+            else:
+                node_list[i].edgecolors = 'blue'
             node_list[i].marker = 's'
         x_pos = node_list[i].init_position[0]
         x_pos_list.append(x_pos)
@@ -391,8 +395,14 @@ for j in range(5*change):
         node_list[i].update_position(node_list[i].init_position)
         if node_list[i].ID not in VANET_heads:
             node_list[i].update_colors(node_list[i].init_position)
+            node_list[i].edgecolors = 'none'
         else:
+            if statistics.mean(node_list[i].last_five_x_position) > 50:
+                node_list[i].edgecolors = 'red'
+            else:
+                node_list[i].edgecolors = 'blue'
             node_list[i].marker = 's'
+
         x_pos = node_list[i].init_position[0]
         x_pos_list.append(x_pos)
         y_pos = node_list[i].init_position[1]
@@ -402,3 +412,6 @@ for j in range(5*change):
 
     plot_positions(node_list)
     plt.cla()
+
+
+
