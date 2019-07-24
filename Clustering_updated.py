@@ -326,9 +326,9 @@ i = VANET_heads[0]
 print(my_nodes[i-1].marker)
 print(my_nodes[i].marker)
 
-#plot_positions(my_nodes)
+plot_positions(my_nodes)
 
-# this updates the cllusterof cluster nnodes but not the cluster heads
+# this updates the cluster of members but not the cluster heads
 for j in range(5*change):
     for i in range(number_of_nodes):
         node_list = my_nodes
@@ -361,10 +361,11 @@ cluster4.clear()
 cluster3.clear()
 cluster2.clear()
 list_of_clusters.clear()
-print(VANET_clusters)
+
 for i in range(number_of_nodes):
     node = my_nodes[i]
     VANET_clusters = call_clusters(node)
+    node.marker = str('.')
 
 
 
@@ -372,9 +373,32 @@ x_pos_cluster = []
 y_pos_cluster = []
 dir_cluster = []
 VANET_heads = assign_head(VANET_clusters, list_of_nodes=my_nodes)
-print(VANET_clusters)
 
-i = VANET_heads[0]
-print(my_nodes[i-1].marker)
-print(my_nodes[i].marker)
+plot_positions(my_nodes)
+
 print(VANET_heads)
+
+# this updates the cluster of members but not the cluster heads
+for j in range(5*change):
+    for i in range(number_of_nodes):
+        node_list = my_nodes
+        x_pos = node_list[i].init_position[0]
+        y_pos = node_list[i].init_position[1]
+        node = node_list[i]
+        node_list[i].update_directions(node_list[i].direction)
+
+        node_list[i].update_speed(node_list[i].init_speed)
+        node_list[i].update_position(node_list[i].init_position)
+        if node_list[i].ID not in VANET_heads:
+            node_list[i].update_colors(node_list[i].init_position)
+        else:
+            node_list[i].marker = 's'
+        x_pos = node_list[i].init_position[0]
+        x_pos_list.append(x_pos)
+        y_pos = node_list[i].init_position[1]
+        y_pos_list.append(y_pos)
+    mean_x = average_fn(x_pos_list)
+    mean_y = average_fn(y_pos_list)
+
+    plot_positions(node_list)
+    plt.cla()
