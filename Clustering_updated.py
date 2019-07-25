@@ -7,6 +7,16 @@ import random
 import itertools
 import statistics
 
+
+
+speed = int(input("Enter the speed of the nodes in m/s: e.g. 4 "))              # user input, constant throughout here
+time = int(input("Enter the refresh time for plots in s: e.g. 2 "))             # user input, constant throughout here, re-plot after every 't' seconds
+number_of_nodes = int(input("Enter the total number of nodes: e.g. 50 "))       # user input, constant throughout here
+change = int(input("Enter the refresh time for cluster reassignment in s (5:1 cluster:head): e.g. 7 "))  # random number, when different clusters can be visualised and are not too far away to never interfere
+stay_alive = int(input("Enter the number of times you want to update the heads: e.g. 10 "))
+
+
+
 """
     This program implements the two-layer clustering in VANETs. The user provides the number of nodes for simulation,
     the speed of the nodes, the update time after which the plots are updated, and the number of simulations before 
@@ -31,10 +41,7 @@ import statistics
     edge colors:    Represents the cluster layer: No edge color for layer 1, layer 2 has blue or red edge colors
 """
 
-speed = 4  # user input, constant throughout here
-time = 2  # user input, constant throughout here, re-plot after every 't' seconds
-number_of_nodes = 50  # user input, constant throughout here
-change = 7  # random number, when different clusters can be visualised and are not too far away to never interfere
+
 speed_x = speed
 speed_y = speed
 mean_x = 0
@@ -383,8 +390,7 @@ def update_supercluster_menbers(VANET_clusters, VANET_heads, list_of_nodes):
 
 
 
-
-for i in range(10):
+for i in range(stay_alive):
     update_cluster_members(list_of_nodes=my_nodes)
     VANET_heads = update_supercluster_menbers(VANET_clusters, VANET_heads, list_of_nodes=my_nodes)
     update_cluster_members(list_of_nodes=my_nodes)
