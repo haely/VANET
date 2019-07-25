@@ -1,4 +1,4 @@
-number_of_nodes = 10
+
 import numpy as np
 import pandas as pd
 import math
