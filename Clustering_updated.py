@@ -269,7 +269,7 @@ for i in range(number_of_nodes):
     node = my_nodes[i]
     VANET_clusters = call_clusters(node)
 
-print(VANET_clusters)
+
 
 x_pos_cluster = []
 y_pos_cluster = []
@@ -305,6 +305,10 @@ def elect_head(cluster, list_of_nodes):
             lowest_dist = lowest_dist
             head_id = head_id
     head_index = head_id-1
+    if statistics.mean(list_of_nodes[head_index].last_five_x_position) > 50:
+        list_of_nodes[head_index].edgecolors = 'red'
+    else:
+        list_of_nodes[head_index].edgecolors = 'blue'
     list_of_nodes[head_index].marker = 's'
     return head_id
 
@@ -321,97 +325,66 @@ def assign_head(list_of_clusters, list_of_nodes):
 VANET_heads = assign_head(VANET_clusters, list_of_nodes=my_nodes)
 print(VANET_heads)
 
-i = VANET_heads[0]
-print(my_nodes[i-1].marker)
-print(my_nodes[i].marker)
 
-plot_positions(my_nodes)
+#plot_positions(my_nodes)
 
 # this updates the cluster of members but not the cluster heads
-for j in range(5*change):
-    for i in range(number_of_nodes):
-        node_list = my_nodes
-        x_pos = node_list[i].init_position[0]
-        y_pos = node_list[i].init_position[1]
-        node = node_list[i]
-        node_list[i].update_directions(node_list[i].direction)
 
-        node_list[i].update_speed(node_list[i].init_speed)
-        node_list[i].update_position(node_list[i].init_position)
-        if node_list[i].ID not in VANET_heads:
-            node_list[i].update_colors(node_list[i].init_position)
-            node_list[i].edgecolors = 'none'
-        else:
-            if statistics.mean(node_list[i].last_five_x_position) > 50:
-                node_list[i].edgecolors = 'red'
+
+def update_cluster_members(list_of_nodes):
+    for j in range(5*change):
+        for i in range(number_of_nodes):
+            node_list = my_nodes
+            x_pos = node_list[i].init_position[0]
+            y_pos = node_list[i].init_position[1]
+            node = node_list[i]
+            node_list[i].update_directions(node_list[i].direction)
+            node_list[i].update_speed(node_list[i].init_speed)
+            node_list[i].update_position(node_list[i].init_position)
+            if node_list[i].ID not in VANET_heads:
+                node_list[i].update_colors(node_list[i].init_position)
+                node.marker = str('.')
+                node_list[i].edgecolors = str('none')
             else:
-                node_list[i].edgecolors = 'blue'
-            node_list[i].marker = 's'
-        x_pos = node_list[i].init_position[0]
-        x_pos_list.append(x_pos)
-        y_pos = node_list[i].init_position[1]
-        y_pos_list.append(y_pos)
-    mean_x = average_fn(x_pos_list)
-    mean_y = average_fn(y_pos_list)
+                if statistics.mean(node_list[i].last_five_x_position) > 50:
+                    node_list[i].edgecolors = str('red')
+                else:
+                    node_list[i].edgecolors = str('blue')
+                node_list[i].marker = str('s')
+            x_pos = node_list[i].init_position[0]
+            x_pos_list.append(x_pos)
+            y_pos = node_list[i].init_position[1]
+            y_pos_list.append(y_pos)
+        mean_x = average_fn(x_pos_list)
+        mean_y = average_fn(y_pos_list)
 
-    plot_positions(node_list)
-    plt.cla()
+        plot_positions(list_of_nodes)
+        plt.cla()
+
 
 
 # this updates cluster heads
-VANET_clusters.clear()
-cluster1.clear()
-cluster4.clear()
-cluster3.clear()
-cluster2.clear()
-list_of_clusters.clear()
+def update_supercluster_menbers(VANET_clusters, VANET_heads, list_of_nodes):
+    VANET_clusters.clear()
+    VANET_heads.clear()
+    cluster1.clear()
+    cluster4.clear()
+    cluster3.clear()
+    cluster2.clear()
+    list_of_clusters.clear()
 
-for i in range(number_of_nodes):
-    node = my_nodes[i]
-    VANET_clusters = call_clusters(node)
-    node.marker = str('.')
-
-
-
-x_pos_cluster = []
-y_pos_cluster = []
-dir_cluster = []
-VANET_heads = assign_head(VANET_clusters, list_of_nodes=my_nodes)
-
-plot_positions(my_nodes)
-
-print(VANET_heads)
-
-# this updates the cluster of members but not the cluster heads
-for j in range(5*change):
     for i in range(number_of_nodes):
-        node_list = my_nodes
-        x_pos = node_list[i].init_position[0]
-        y_pos = node_list[i].init_position[1]
-        node = node_list[i]
-        node_list[i].update_directions(node_list[i].direction)
+        node = my_nodes[i]
+        VANET_clusters = call_clusters(node)
 
-        node_list[i].update_speed(node_list[i].init_speed)
-        node_list[i].update_position(node_list[i].init_position)
-        if node_list[i].ID not in VANET_heads:
-            node_list[i].update_colors(node_list[i].init_position)
-            node_list[i].edgecolors = 'none'
-        else:
-            if statistics.mean(node_list[i].last_five_x_position) > 50:
-                node_list[i].edgecolors = 'red'
-            else:
-                node_list[i].edgecolors = 'blue'
-            node_list[i].marker = 's'
-
-        x_pos = node_list[i].init_position[0]
-        x_pos_list.append(x_pos)
-        y_pos = node_list[i].init_position[1]
-        y_pos_list.append(y_pos)
-    mean_x = average_fn(x_pos_list)
-    mean_y = average_fn(y_pos_list)
-
-    plot_positions(node_list)
-    plt.cla()
+    VANET_heads = assign_head(VANET_clusters, list_of_nodes)
+    print(VANET_heads)
+    return VANET_heads
 
 
 
+
+for i in range(10):
+    update_cluster_members(list_of_nodes=my_nodes)
+    VANET_heads = update_supercluster_menbers(VANET_clusters, VANET_heads, list_of_nodes=my_nodes)
+    update_cluster_members(list_of_nodes=my_nodes)
