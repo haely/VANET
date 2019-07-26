@@ -91,9 +91,9 @@ class Node(object):
                                     direction                           (randomly assigned: 1: straight, 2 up, 3 down)
                                     last five directions                (list of last five directions)
                                     color                               (all nodes start with colour blue)
-                                    marker                              (all nodes start with '.' 
+                                    marker                              (all nodes start with '.'
                                                                                 and heads are promoted to 's'
-                                    edgecolors                          (all nodes start with no edge color, 
+                                    edgecolors                          (all nodes start with no edge color,
                                                                                   supercluser have the same edge color)
     """
     _ID = 1  # class global ID
@@ -410,3 +410,5 @@ for i in range(stay_alive):
     update_cluster_members(list_of_nodes=my_nodes)
     VANET_heads = update_supercluster_menbers(VANET_clusters, VANET_heads, list_of_nodes=my_nodes)
     update_cluster_members(list_of_nodes=my_nodes)
+
+print("End of programmne")
