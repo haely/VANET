@@ -1,20 +1,39 @@
-
 import numpy as np
-import pandas as pd
 import math
 import matplotlib.pyplot as plt
 import random
-import itertools
 import statistics
 
+choice = str(input("Do you want to go ahead with default scenario settings? Enter Y or N: "))
 
-field_len = int(input("Enter the side of the field in m: e.g. 700 "))
-speed = int(input("Enter the speed of the nodes in m/s: e.g. 4 "))              # user input, constant throughout here
-time = int(input("Enter the refresh time for plots in s: e.g. 2 "))             # user input, constant throughout here, re-plot after every 't' seconds
-number_of_nodes = int(input("Enter the total number of nodes: e.g. 50 "))       # user input, constant throughout here
-change = int(input("Enter the refresh time for cluster reassignment in s (5:1 cluster:head): e.g. 7 "))  # random number, when different clusters can be visualised and are not too far away to never interfere
-stay_alive = int(input("Enter the number of times you want to update the heads: e.g. 10 "))
 
+if choice == 'N':
+    field_len = input("Enter the side of the field in m: e.g. 700 ")
+    speed = input("Enter the speed of the nodes in m/s: e.g. 4 ")
+    time = input("Enter the refresh time for plots in s: e.g. 2 ")
+    number_of_nodes = input("Enter the total number of nodes: e.g. 50 ")
+    change = input("Enter the refresh time for cluster reassignment in s "
+                       "(5:1 cluster:head): e.g. 7 ")
+    stay_alive = input("Enter the number of times you want to update the heads: e.g. 10 ")
+
+    field_len = int(field_len)
+    speed = int(speed)
+    time = int(time)
+    number_of_nodes = int(number_of_nodes)
+    change = int(change)
+    stay_alive = int(stay_alive)
+
+elif choice == 'Y':
+    field_len = 700
+    speed = 4
+    time = 2
+    number_of_nodes = 50
+    change = 7                 # when different clusters can be visualised and are not too far away to never interfere
+    stay_alive = 10
+
+else:
+    print("Invalid entry")
+    exit()
 
 
 """
@@ -73,7 +92,7 @@ class Node(object):
                                     last five directions                (list of last five directions)
                                     color                               (all nodes start with colour blue)
                                     marker                              (all nodes start with '.' and heads are promoted to 's'
-                                    edgecolors                          (all nodes start with no edgeg color, heads that form a cluser have the same edge color)
+                                    edgecolors                          (all nodes start with no edge color, heads that form a cluser have the same edge color)
     """
     _ID = 1  # class global ID
 
@@ -223,14 +242,12 @@ def node_latest_pos_list(list_of_node_ids, list_of_nodes):  # id_of_node is a li
     pos_list = [x_pos_list, y_pos_list]
     return pos_list
 
+
 # repeat this everytime you want to elecet a head, calculates mmean
 id_list = []
 for i in range(number_of_nodes):
     curr_id = my_nodes[i].ID
     id_list.append(curr_id)
-#node_latest_positions = node_latest_pos_list(id_list, my_nodes)
-#x_pos_list = node_latest_positions[0]
-#y_pos_list = node_latest_positions[1]
 
 
 def update_pos_n_plot(list_of_node_ids, list_of_nodes):
@@ -245,6 +262,7 @@ def update_pos_n_plot(list_of_node_ids, list_of_nodes):
 def average_fn(z_list):
     z_mean = statistics.mean(z_list)
     return z_mean
+
 
 # call this to form clusters, dorections unchanged. intitial cluster formation
 for j in range(change):
@@ -271,8 +289,8 @@ def call_clusters(node):
     list_of_clusters = [cluster1, cluster2, cluster3, cluster4]
     return list_of_clusters
 
-# this creates a list of clusters called VANET_clusters, usually called to elect heads
 
+# this creates a list of clusters called VANET_clusters, usually called to elect heads
 for i in range(number_of_nodes):
     node = my_nodes[i]
     VANET_clusters = call_clusters(node)
@@ -289,10 +307,10 @@ def elect_head(cluster, list_of_nodes):
     head_id = -1
     lowest_dist = 10**5
     for i in range(len(cluster)):
-        node_id = int(cluster[i]-1)                      # node id is actually node index, should probably change original ids
-        last_node_x = list_of_nodes[node_id].init_position[0]
-        last_node_y = list_of_nodes[node_id].init_position[1]
-        dir_node = list_of_nodes[node_id].direction
+        node_index = int(cluster[i]-1)
+        last_node_x = list_of_nodes[node_index].init_position[0]
+        last_node_y = list_of_nodes[node_index].init_position[1]
+        dir_node = list_of_nodes[node_index].direction
         x_pos_cluster.append(last_node_x)
         y_pos_cluster.append(last_node_y)
         dir_cluster.append(dir_node)
@@ -301,13 +319,13 @@ def elect_head(cluster, list_of_nodes):
     dir_cluster_avg = statistics.mean(dir_cluster)
     for i in range(len(cluster)):
         node_id = int(cluster[i]-1)
-        x_dev_sq = (statistics.mean(list_of_nodes[node_id].last_five_x_position) - x_pos_cluster_avg)**2
-        y_dev_sq = (statistics.mean(list_of_nodes[node_id].last_five_x_position) - y_pos_cluster_avg)**2
+        x_dev_sq = (statistics.mean(list_of_nodes[node_index].last_five_x_position) - x_pos_cluster_avg)**2
+        y_dev_sq = (statistics.mean(list_of_nodes[node_index].last_five_x_position) - y_pos_cluster_avg)**2
         node_dist = math.sqrt(x_dev_sq + y_dev_sq)
-        node_dir_avg = abs(list_of_nodes[node_id].direction - dir_cluster_avg)
+        node_dir_avg = abs(list_of_nodes[node_index].direction - dir_cluster_avg)
 
         if (node_dir_avg*node_dist) <= lowest_dist:
-            head_id = node_id+1
+            head_id = node_index+1
             lowest_dist = node_dist*node_dir_avg
         else:
             lowest_dist = lowest_dist
@@ -334,11 +352,7 @@ VANET_heads = assign_head(VANET_clusters, list_of_nodes=my_nodes)
 print(VANET_heads)
 
 
-#plot_positions(my_nodes)
-
-# this updates the cluster of members but not the cluster heads
-
-
+# this updates the cluster members but not the cluster heads
 def update_cluster_members(list_of_nodes):
     for j in range(5*change):
         for i in range(number_of_nodes):
@@ -388,7 +402,6 @@ def update_supercluster_menbers(VANET_clusters, VANET_heads, list_of_nodes):
     VANET_heads = assign_head(VANET_clusters, list_of_nodes)
     print(VANET_heads)
     return VANET_heads
-
 
 
 for i in range(stay_alive):
