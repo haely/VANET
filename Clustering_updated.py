@@ -8,7 +8,7 @@ import itertools
 import statistics
 
 
-
+field_len = int(input("Enter the side of the field in m: e.g. 700 "))
 speed = int(input("Enter the speed of the nodes in m/s: e.g. 4 "))              # user input, constant throughout here
 time = int(input("Enter the refresh time for plots in s: e.g. 2 "))             # user input, constant throughout here, re-plot after every 't' seconds
 number_of_nodes = int(input("Enter the total number of nodes: e.g. 50 "))       # user input, constant throughout here
@@ -46,7 +46,8 @@ speed_x = speed
 speed_y = speed
 mean_x = 0
 mean_y = 0
-
+pos_end =field_len
+neg_end = -1*(field_len)
 list_of_clusters = [[], [], [], []]
 cluster1 = []
 cluster2 = []
@@ -109,8 +110,8 @@ class Node(object):
 
         self.time_taken = time_taken
 
-        init_x = random.randint(-250, 250)
-        init_y = random.randint(-250, 250)
+        init_x = random.randint(neg_end//2.5, pos_end//2.5)
+        init_y = random.randint(neg_end//2.5, pos_end//2.5)
         init_position = np.array([init_x, init_y])
         self.init_position = init_position
         self.last_five_x_position = [0, 0, 0, 0, 0]
@@ -188,8 +189,8 @@ my_nodes = init_node(number_of_nodes)
 
 def plot_positions(list_of_node_parameters):
     for node in range(len(list_of_node_parameters)):
-        plt.xlim(-600,600)
-        plt.ylim(-600,600)
+        plt.xlim(neg_end,pos_end)
+        plt.ylim(neg_end,pos_end)
         x = list_of_node_parameters[node].init_position[0]
         y = list_of_node_parameters[node].init_position[1]
         color = list_of_node_parameters[node].color
