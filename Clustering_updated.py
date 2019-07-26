@@ -78,21 +78,23 @@ head_list = []
 class Node(object):
     """
         Node class:
-        the attributes consist of   ID,                                 (Auto assigned, start with 1, auto-increment by 1)
+        the attributes consist of   ID,                                 (Auto assigned, starts with 1, auto-incremented)
                                     speed vector x component,           (derived from user input)
                                     speed vector y component,           (derived from user input)
                                     speed vector,                       (derived from user input)
                                     last five speed vector,             (list of last five speed vectors)
                                     time taken,                         (user input)
-                                    position vector,                    (randomly assigned in range [(-250,250), (-250,250)]
+                                    position vector,                    (randomly assigned in half of the range input
                                     last five position vector,          (list of last five position vectors)
                                     last five x position                (list of last five x position vectors)
                                     last five y position                (list of last five y position vectors)
                                     direction                           (randomly assigned: 1: straight, 2 up, 3 down)
                                     last five directions                (list of last five directions)
                                     color                               (all nodes start with colour blue)
-                                    marker                              (all nodes start with '.' and heads are promoted to 's'
-                                    edgecolors                          (all nodes start with no edge color, heads that form a cluser have the same edge color)
+                                    marker                              (all nodes start with '.' 
+                                                                                and heads are promoted to 's'
+                                    edgecolors                          (all nodes start with no edge color, 
+                                                                                  supercluser have the same edge color)
     """
     _ID = 1  # class global ID
 
