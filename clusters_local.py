@@ -254,16 +254,16 @@ def elect_head(list_of_nodes):
     else:
         raise ValueError('did not have enough nodes to form clusters')
         exit()
-    orpan_count = 0
+    orphan_count = 0
     for cluster in cluster_list:
         temp = 0
         if len(cluster) == 1:
-            orpan_count+=1
-            orpan_id = cluster[0]
-            print('my orpan')
-            print(orpan_id)
-            orpan_x = list_of_nodes[orpan_id - 1].init_position[0]
-            orpan_y = list_of_nodes[orpan_id - 1].init_position[1]
+            orphan_count+=1
+            orphan_id = cluster[0]
+            print('my orphan')
+            print(orphan_id)
+            orphan_x = list_of_nodes[orphan_id - 1].init_position[0]
+            orphan_y = list_of_nodes[orphan_id - 1].init_position[1]
             cluster_list.remove(cluster)
             loop_count = 0
             for cluster in cluster_list:
@@ -272,8 +272,8 @@ def elect_head(list_of_nodes):
                         node_x = list_of_nodes[node - 1].init_position[0]
                         node_y = list_of_nodes[node - 1].init_position[1]
 
-                        if abs(orpan_x - node_x) <= dist_radius / 2 and abs(orpan_y - node_y) <= dist_radius / 4:
-                            cluster.append(orpan_id)
+                        if abs(orphan_x - node_x) <= dist_radius / 2 and abs(orphan_y - node_y) <= dist_radius / 4:
+                            cluster.append(orphan_id)
                             temp += 1
                             loop_count+=1
                         else:
@@ -281,15 +281,15 @@ def elect_head(list_of_nodes):
                         if loop_count>1:
                             break
             if temp == 1:
-                print('still an orp')
-                orpan_cluster = [orpan_id]
+                print('still an orphan')
+                orphan_cluster = [orphan_id]
                 cluster_list.append(orpan_cluster)
                 head_id_list.append(orpan_id)
             else:
-                print('orpan no more')
+                print('orphan no more')
 
-    if orpan_count == 0:
-        print('we bever ad orpans' )
+    if orphan_count == 0:
+        print('we never had orphans' )
 
     return head_id_list, cluster_list
 
