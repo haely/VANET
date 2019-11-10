@@ -304,6 +304,7 @@ def form_clusters(cluster_list, list_of_nodes):
 VANET_heads = elect_head(list_of_nodes=my_nodes)
 print(VANET_heads)
 
-# we now ave clusters and possibly orpans, now orpans will find clusters to join. tey look for closest cluster memberse i.e dis_radii is now field_len/7
+# we now have clusters and possibly orphans, now orphans will find clusters to join. 
+#they look for closest cluster memberes i.e dist_radius is now field_len/7
 
 
