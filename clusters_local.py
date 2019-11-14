@@ -5,7 +5,7 @@ import random
 import statistics
 import pylint
 choice = str(input("Do you want to go ahead with default scenario settings? Enter Y or N: "))
-
+from statistics import mean
 cluster_list = []
 if choice == 'N':
     field_len = input("Enter the side of the field in m: e.g. 700 ")
@@ -183,7 +183,7 @@ class Node(object):
             for node in cluster:
                 if curr_node_id == node:
                     self.color = cluster[-1]
-        print(self.color)
+        #print(self.color)
 
 
 
@@ -202,13 +202,14 @@ def init_node(total_nodes):
 
 # creates 'number_of_nodes' objects and stores in my_nodes list, to be called later
 my_nodes = init_node(number_of_nodes)
-print(my_nodes[1].ID)
+#print(my_nodes[1].ID)
 
 # repeat this everytime you want to elecet a head, calculates mmean
 id_list = []
 for i in range(number_of_nodes):
     curr_id = my_nodes[i].ID
     id_list.append(curr_id)
+print("These are node ids:")
 print(id_list)
 
 def elect_head(list_of_nodes):
@@ -249,7 +250,9 @@ def elect_head(list_of_nodes):
             #list_of_nodes[head_id].marker = 's'
             #cluster_list.append(cluster)
             head_id_list.append(head_id)
+        print("intital clustering")
         print(cluster_list)
+        print("initial heads")
         print(head_id_list)
     else:
         raise ValueError('did not have enough nodes to form clusters')
@@ -273,9 +276,11 @@ def elect_head(list_of_nodes):
                         node_y = list_of_nodes[node - 1].init_position[1]
 
                         if abs(orphan_x - node_x) <= dist_radius / 2 and abs(orphan_y - node_y) <= dist_radius / 4:
+
                             cluster.append(orphan_id)
                             temp += 1
                             loop_count+=1
+
                         else:
                             pass
                         if loop_count>1:
@@ -283,9 +288,10 @@ def elect_head(list_of_nodes):
             if temp == 1:
                 print('still an orphan')
                 orphan_cluster = [orphan_id]
-                cluster_list.append(orpan_cluster)
-                head_id_list.append(orpan_id)
+                cluster_list.append(orphan_cluster)
+                head_id_list.append(orphan_id)
             else:
+                cluster_list.append(cluster)
                 print('orphan no more')
 
     if orphan_count == 0:
@@ -295,16 +301,96 @@ def elect_head(list_of_nodes):
 
 
 
-def form_clusters(cluster_list, list_of_nodes):
-    for i_cluster in cluster_list:
-        for j in i_cluster:
-            list_of_nodes[j-1].color = min(i_cluster)
-
 # this creates a list of heads called VANET_heads
 VANET_heads = elect_head(list_of_nodes=my_nodes)
-print(VANET_heads)
+#print(VANET_heads)
+cluster_list = VANET_heads[1]
+head_list = VANET_heads[0]
+print("clusters after orphan update")
+print(cluster_list)
+print("heads after orphan update")
+print(head_list)
+# we now ave clusters and possibly orphans, now orphans will find clusters to join. tey look for closest cluster memberse i.e dis_radii is now field_len/7
 
-# we now have clusters and possibly orphans, now orphans will find clusters to join. 
-#they look for closest cluster memberes i.e dist_radius is now field_len/7
+
+def update_cluster_head(list_of_clusters, list_of_nodes):
+    #updated_head_list = []
+    global updated_head_list
+
+    #New_head = 0
+    for cluster in list_of_clusters:
+        sum_x=0
+        sum_y=0
+        for node in cluster:
+            xmean_node = mean(list_of_nodes[node-1].last_five_x_position)
+            ymean_node = mean(list_of_nodes[node - 1].last_five_y_position)
+            sum_x = sum_x+xmean_node
+            sum_y = sum_y+ymean_node
+        xmean_cluster = sum_x/len(cluster)
+        ymean_cluster = sum_y/len(cluster)
+        curr_head = min(cluster)
+        xmean_curr = mean(list_of_nodes[curr_head - 1].last_five_x_position)
+        ymean_curr = mean(list_of_nodes[curr_head - 1].last_five_y_position)
+        curr_min = abs(xmean_cluster-xmean_curr)*abs(ymean_cluster-ymean_curr)
+        for node in cluster:
+            xmean_node = mean(list_of_nodes[node-1].last_five_x_position)
+            ymean_node = mean(list_of_nodes[node-1].last_five_y_position)
 
 
+            if abs(xmean_node-xmean_cluster)*abs(ymean_node-ymean_cluster) <= curr_min:
+                curr_min = abs(xmean_node-xmean_cluster)*abs(ymean_node-ymean_cluster)
+                new_head = node
+
+            else:
+                new_head = curr_head
+        #updated_head_list = []
+        updated_head_list.append(new_head)
+        updated_head_list=set(updated_head_list)
+        updated_head_list=list(updated_head_list)
+    return updated_head_list
+
+updated_head_list = []
+new_heads = update_cluster_head(list_of_clusters=cluster_list, list_of_nodes=my_nodes)
+print("heads after first recheck")
+print(new_heads)
+
+
+
+def update_clusters(list_of_nodes, list_of_new_heads, list_of_ids):
+    updated_cluster_list = []
+    dist_radius = field_len / 5
+    # updated_head_list = []
+    # global updated_cluster_list
+    rem_id_list = [ele for ele in list_of_ids if ele not in list_of_new_heads]
+    for head in list_of_new_heads:
+        head_j = head - 1
+        head_x = list_of_nodes[head_j].init_position[0]
+        head_y = list_of_nodes[head_j].init_position[1]
+        i_cluster = []
+        i_cluster.append(head)
+        for j in rem_id_list:
+            mem_x = list_of_nodes[j - 1].init_position[0]
+            mem_y = list_of_nodes[j - 1].init_position[1]
+            if abs(mem_x - head_x) <= dist_radius and abs(mem_y - head_y) <= dist_radius:
+                rem_id_list.remove(j)
+                i_cluster.append(j)
+            else:
+                pass
+        updated_cluster_list.append(i_cluster)
+    return updated_cluster_list
+
+my_id_list = []
+for i in range(number_of_nodes):
+    curr_id = my_nodes[i].ID
+    my_id_list.append(curr_id)
+updated_cluster = update_clusters(list_of_nodes=my_nodes, list_of_new_heads=new_heads, list_of_ids=my_id_list)
+print("cluster after first recheck")
+print(updated_cluster)
+
+updated_head_list = []
+new_heads = update_cluster_head(list_of_clusters=cluster_list, list_of_nodes=my_nodes)
+print("heads after second recheck")
+print(new_heads)
+updated_cluster = update_clusters(list_of_nodes=my_nodes, list_of_new_heads=new_heads, list_of_ids=my_id_list)
+print("cluster after second recheck")
+print(updated_cluster)
