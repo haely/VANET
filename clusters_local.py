@@ -148,11 +148,11 @@ class Node(object):
             for node in cluster:
                 if curr_node_id == node:
                     self.color = cluster[-1]
-        # print(self.color)
+        # print
 
     def update_directions(self, direction):
         direction = self.direction
-        direction = random.randint(1, 4)
+        direction = random.randint(1, 3)
         self.direction = direction
 
 
@@ -172,42 +172,20 @@ id_list = []
 for i in range(number_of_nodes):
     curr_id = my_nodes[i].ID
     id_list.append(curr_id)
-print("These are node ids:")
-print(id_list)
+#print("These are node ids:")
+#print(id_list)
 
-
-def plot_positions(list_of_node_parameters):
-    for node in range(len(list_of_node_parameters)):
-        plt.xlim(neg_end,pos_end)
-        plt.ylim(neg_end,pos_end)
-        x = list_of_node_parameters[node].init_position[0]
-        y = list_of_node_parameters[node].init_position[1]
-        color = list_of_node_parameters[node].color
-        node_marker = list_of_node_parameters[node].marker
-        node_edgecolor = list_of_node_parameters[node].edgecolors
-        plt.scatter(x, y, c=color, marker=node_marker, edgecolors=node_edgecolor)
-    plt.pause(0.005)
-
-
-def plot_update_for(num_updates, list_of_nodes):
-    for j in range(change):  # for as many times as we want to update, 13 here
-        for i in range(number_of_nodes):  # for every node
-            list_of_nodes[i].update_speed(list_of_nodes[i].init_speed)  # update speed
-            list_of_nodes[i].update_position(list_of_nodes[i].init_position)  # update position
-        plot_positions(list_of_nodes)  # call the plot function that replots every 5 ms
-        plt.cla()
-
-# plots for the inital nodes. all blue
-plot_update_for(change, my_nodes)
 
 def elect_head(list_of_nodes):
     head_cluster_list = []
     head_id = -1
-    dist_radius = field_len / 5
+    dist_radius = field_len // 5
     rem_id_list = id_list
+    print(rem_id_list)
     if len(rem_id_list) > 0:
         cluster_list = []
-        for i in id_list:
+        for i in rem_id_list:
+            #print(i)
             temp_head_id = i
             head_x = list_of_nodes[temp_head_id - 1].init_position[0]
             head_y = list_of_nodes[temp_head_id - 1].init_position[1]
@@ -218,59 +196,60 @@ def elect_head(list_of_nodes):
                 if abs(mem_x - head_x) <= dist_radius and abs(mem_y - head_y) <= dist_radius:
                     rem_id_list.remove(j)
                     i_cluster.append(j)
-                else:
-                    pass
-            # print(i_cluster)
+
+            print(i_cluster)
             if len(i_cluster) > 0:
+                print(i_cluster)
                 cluster_list.append(i_cluster)
         head_id_list = []
         for cluster in cluster_list:
             head_id = min(cluster)
-            # cluster_color = c=np.random.rand(3,)  #str('C' + str(100*head_id))
-            # cluster.append(cluster_color)
-            # list_of_nodes[head_id].marker = 's'
-            # cluster_list.append(cluster)
             head_id_list.append(head_id)
-        print("intital clustering")
-        #print(cluster_list)
-        print("initial heads")
-        #print(head_id_list)
+
     else:
         raise ValueError('did not have enough nodes to form clusters')
         exit()
+    lenf = 0
+    for cluster in cluster_list:
+        lenf += len(cluster)
+    print(lenf)
+    print(rem_id_list)
     orphan_count = 0
     for cluster in cluster_list:
         temp = 0
         if len(cluster) == 1:
             orphan_count += 1
             orphan_id = cluster[0]
-            print('my orphan')
-            print(orphan_id)
+            #print('my orphan')
+            #print(orphan_id)
             orphan_x = list_of_nodes[orphan_id - 1].init_position[0]
             orphan_y = list_of_nodes[orphan_id - 1].init_position[1]
             cluster_list.remove(cluster)
+            head_id_list.remove(orphan_id)
             loop_count = 0
             for cluster in cluster_list:
                 if len(cluster) > 1:
-                    for node in cluster:
-                        node_x = list_of_nodes[node - 1].init_position[0]
-                        node_y = list_of_nodes[node - 1].init_position[1]
-                        if abs(orphan_x - node_x) <= dist_radius / 2 and abs(orphan_y - node_y) <= dist_radius / 4:
-                            cluster.append(orphan_id)
-                            temp += 1
-                            loop_count += 1
-                        else:
-                            pass
-                        if loop_count > 1:
-                            break
-            if temp == 1:
-                print('still an orphan')
+                    head_cluster = min(cluster)
+                    head_x = list_of_nodes[head_cluster - 1].init_position[0]
+                    head_y = list_of_nodes[head_cluster - 1].init_position[1]
+
+                    if abs(orphan_x - head_x) <= dist_radius / 3 and abs(orphan_y - head_y) <= dist_radius / 3:
+                        cluster_list.remove(cluster)
+                        head_id_list.remove(head_cluster)
+                        cluster.append(orphan_id)
+                        temp += 1
+                        loop_count += 1
+                        cluster_list.append(cluster)
+                        head_id_list.append(head_cluster)
+                        print('orphan no more')
+                    if loop_count > 0:
+                        break
+            if temp == 0:
+                #print('still an orphan')
                 orphan_cluster = [orphan_id]
                 cluster_list.append(orphan_cluster)
                 head_id_list.append(orphan_id)
-            else:
-                cluster_list.append(cluster)
-                print('orphan no more')
+                #print('orphan no more')
     if orphan_count == 0:
         print('we never had orphans')
     head_cluster_list.append(head_id_list)
@@ -289,7 +268,10 @@ print("clusters after orphan update")
 print(cluster_list)
 print("heads after orphan update")
 print(head_list)
-
+lenf=0
+for cluster in cluster_list:
+    lenf += len(cluster)
+print(lenf)
 
 # we now ave clusters and possibly orphans, now orphans will find clusters to join. tey look for closest cluster memberse i.e dis_radii is now field_len/7
 def update_cluster_head(list_of_clusters, list_of_nodes):
@@ -397,7 +379,6 @@ print(updated_cluster[0])
 print("also heads")
 print(updated_cluster[1])
 
-
 def node_latest_pos_list(list_of_node_ids, list_of_nodes):  # id_of_node is a list of node ids
     x_pos_list = []
     y_pos_list = []
@@ -410,14 +391,12 @@ def node_latest_pos_list(list_of_node_ids, list_of_nodes):  # id_of_node is a li
     pos_list = [x_pos_list, y_pos_list]
     return pos_list
 
-
 def update_pos_n_plot(list_of_node_ids, list_of_nodes):
     for i in list_of_node_ids:
         node_index = i - 1
         list_of_nodes[node_index].update_speed(list_of_nodes[node_index].init_speed)
         list_of_nodes[node_index].update_position(list_of_nodes[node_index].init_position)
         list_of_nodes[node_index].update_colors(list_of_nodes[node_index].init_position)
-
 
 for j in range(change):
     node_positions = node_latest_pos_list(list_of_node_ids=my_id_list, list_of_nodes=my_nodes)
@@ -431,3 +410,6 @@ print(new_heads)
 updated_cluster = update_clusters(list_of_nodes=my_nodes, list_of_new_heads=new_heads, list_of_ids=my_id_list)
 print("cluster after second recheck")
 print(updated_cluster)
+
+new_heads.sort()
+#for head in new_heads:
